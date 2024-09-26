@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Weather App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Modern Weather App</h1>
+        <form method="POST">
+            <input type="text" name="city" placeholder="Enter city name" required>
+            <button type="submit">Search</button>
+        </form>
+        {% if weather_data %}
+        <div class="weather-info">
+            <h2>{{ weather_data.city }}</h2>
+            <img src="http://openweathermap.org/img/w/{{ weather_data.icon }}.png" alt="Weather icon" class="weather-icon">
+            <p class="temperature">{{ weather_data.temperature }}°C</p>
+            <p>{{ weather_data.description | capitalize }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
