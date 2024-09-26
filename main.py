@@ -1,38 +1,30 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, request
 import requests
 
 app = Flask(__name__)
 
-# Reemplaza esto con tu propia API key de OpenWeatherMap
-API_KEY = "tu_api_key_aqui"
-BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
+# Solicitar la clave de API al iniciar la aplicación
+API_KEY = input("Por favor, introduce tu clave de API de OpenWeatherMap: ")
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    weather_data = None
-    if request.method == 'POST':
-        city = request.form['city']
-        weather_data = get_weather(city)
-    return render_template('index.html', weather_data=weather_data)
+@app.route('/')
+def hello_world():
+    return 'Bienvenido a la aplicación del clima!'
 
-def get_weather(city):
-    params = {
-        'q': city,
-        'appid': API_KEY,
-        'units': 'metric'
-    }
-    response = requests.get(BASE_URL, params=params)
-    data = response.json()
+@app.route('/clima')
+def obtener_clima():
+    ciudad = request.args.get('ciudad', 'Madrid')  # Ciudad por defecto: Madrid
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={API_KEY}&units=metric&lang=es"
     
+    response = requests.get(url)
     if response.status_code == 200:
-        return {
-            'city': data['name'],
-            'temperature': data['main']['temp'],
-            'description': data['weather'][0]['description'],
-            'icon': data['weather'][0]['icon']
-        }
-    return None
+        data = response.json()
+        temp = data['main']['temp']
+        descripcion = data['weather'][0]['description']
+        return f"El clima en {ciudad}: {descripcion}, temperatura: {temp}°C"
+    else:
+        return "No se pudo obtener la información del clima", 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
